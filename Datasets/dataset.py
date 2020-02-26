@@ -357,8 +357,6 @@ class BratsDataset(Dataset):
 
                     self.dataset["images"].append(image)
                     self.dataset["segs"].append(seg)
-                    if len(self.dataset["images"]) > 0:
-                        break 
         
     def file_close(self):
         return

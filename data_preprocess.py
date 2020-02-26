@@ -82,7 +82,7 @@ def main():
                         # Save to file
                         utils.save_nii(data, output_path)
 
-    with tqdm(enumerate(validation_set), total=len(training_set)) as pbar: # progress bar
+    with tqdm(enumerate(validation_set), total=len(validation_set)) as pbar: # progress bar
         for i, item in pbar:
             for root, dirs, files in os.walk(item['path']):
                 for file in files:
