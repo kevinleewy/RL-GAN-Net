@@ -4,7 +4,7 @@ import torch.utils.data
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import time
-from models.lossess import ChamferLoss
+from models.metrics import SoftDiceLoss
 
 import Datasets
 import models
@@ -93,7 +93,7 @@ args = parser.parse_args()
 args.device = torch.device("cuda:%d" % (args.gpu_id) if torch.cuda.is_available() else "cpu") # for selecting device for chamfer loss
 #cuda.select_device
 torch.cuda.set_device(args.gpu_id)
-print('Using Tintan xp GPU : ',torch.cuda.current_device())
+print('Using Titan xp GPU : ', torch.cuda.current_device())
 
 
 
@@ -299,7 +299,7 @@ def test(valid_loader,model,epoch,args,chamfer,vis_Valid,vis_Valida,test_writer)
     model.eval()
     end = time.time()
     epoch_size = len(valid_loader)
-    j = 1;
+    j = 1
     for i,(input) in enumerate(valid_loader):
 
         with torch.no_grad():
@@ -347,7 +347,7 @@ def validation(valid_loader,model,epoch,args,chamfer,vis_Valid,vis_Valida,valid_
     model.eval()
     end = time.time()
     epoch_size = len(valid_loader)
-    j = 1;
+    j = 1
     for i,(input) in enumerate(valid_loader):
 
         with torch.no_grad():

@@ -1,7 +1,9 @@
-import shutil
-import torch
-import os
+import nibabel as nib
 import numpy as np
+import os
+import shutil
+import tensorboardX
+import torch
 
 def get_n_params(model):
     pp=0
@@ -17,7 +19,12 @@ def save_checkpoint(state,is_best,save_path,filename = 'checkpoint.pth.tar'):
     if is_best:
         shutil.copyfile(os.path.join(save_path,filename), os.path.join(save_path, 'model_best.pth.tar'))
 
+def read_nii(file):
+    f = nib.load(file)
+    return f.get_fdata(), f.affine
 
+def save_nii(data, filename, affine=np.eye(4)):
+    nib.save(nib.Nifti1Image(data, affine=affine), filename)
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -40,6 +47,64 @@ class AverageMeter(object):
     def __repr__(self):
         return '{:.3f} ({:.3f})'.format(self.val, self.avg)
 
+class Logger(object):
+
+    def __init__(self, model_name,header):
+        self.header = header
+        self.writer = tensorboardX.SummaryWriter("./runs/"+model_name.split("/")[-1].split(".h5")[0])
+
+    def __del(self):
+        self.writer.close()
+
+    def log(self, phase, values):
+        epoch = values['epoch']
+        
+        for col in self.header[1:]:
+            self.writer.add_scalar(phase+"/"+col,float(values[col]),int(epoch))
+
+
+def load_value_file(file_path):
+    with open(file_path, 'r') as input_file:
+        value = float(input_file.read().rstrip('\n\r'))
+
+    return value
+
+#def calculate_accuracy(outputs, targets):
+#    batch_size = targets.size(0)
+#
+#    _, pred = outputs.topk(1, 1, True)
+#    pred = pred.t()
+#    correct = pred.eq(targets.view(1, -1))
+#    n_correct_elems = correct.float().sum().data[0]
+#
+#    return n_correct_elems / batch_size
+
+def calculate_accuracy(outputs, targets, threshold=0.5):
+    return dice_coefficient(outputs, targets, threshold)
+
+def dice_coefficient(outputs, targets, threshold=0.5, eps=1e-8):
+    batch_size = targets.size(0)
+    y_pred = outputs[:,0,:,:,:]
+    y_truth = targets[:,0,:,:,:]
+    y_pred = y_pred > threshold
+    y_pred = y_pred.type(torch.FloatTensor)
+    intersection = torch.sum(torch.mul(y_pred, y_truth)) + eps/2
+    union = torch.sum(y_pred) + torch.sum(y_truth) + eps
+    dice = 2 * intersection / union 
+    
+    return dice / batch_size
+
+def load_old_model(model, optimizer, saved_model_path):
+    print("Constructing model from saved file... ")
+    checkpoint = torch.load(saved_model_path)
+    epoch = checkpoint["epoch"]
+    model.load_state_dict(checkpoint["state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer"])
+    
+    return model, epoch, optimizer 
+
+def normalize_data(data, mean, std):
+    pass    
 
 # Simple replay buffer
 class ReplayBuffer(object):

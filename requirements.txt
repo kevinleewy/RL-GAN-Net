@@ -1,0 +1,6 @@
+matplotlib
+nibabel
+nilearn
+numpy
+torch
+torchvision
