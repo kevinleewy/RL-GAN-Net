@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
 import os
+from tqdm import tqdm
 import sys
 
 import utils
@@ -48,37 +49,71 @@ def main():
     print('Training set: {} patients'.format(len(training_set)))
     print('Validation set: {} patients'.format(len(validation_set)))
 
-    for item in training_set:
-        for root, dirs, files in os.walk(item['path']):
-            for file in files:
-                if file.endswith('.nii.gz'):
+    with tqdm(enumerate(training_set), total=len(training_set)) as pbar: # progress bar
+        for i, item in pbar:
+            for root, dirs, files in os.walk(item['path']):
+                for file in files:
+                    if file.endswith('.nii.gz'):
 
-                    full_file_path = os.path.join(root, file)
+                        full_file_path = os.path.join(root, file)
 
-                    output_path = os.path.join(
-                        opt.output_dir,
-                        'train',
-                        item['patient'],
-                        file.replace('.nii.gz', '.nii')
-                    )
+                        output_path = os.path.join(
+                            opt.output_dir,
+                            'train',
+                            item['patient'],
+                            file.replace('.nii.gz', '.nii')
+                        )
 
-                    # Create output directory if not yet exists
-                    directory = os.path.dirname(output_path)
-                    if not os.path.exists(directory):
-                        os.makedirs(directory)
+                        # Create output directory if not yet exists
+                        directory = os.path.dirname(output_path)
+                        if not os.path.exists(directory):
+                            os.makedirs(directory)
 
-                    # Read NifTI file
-                    data, affine = utils.read_nii(full_file_path)
+                        # Read NifTI file
+                        data, affine = utils.read_nii(full_file_path)
 
-                    # Normalize
-                    if not file.endswith('seg.nii.gz'):
-                        data, stats = normalize(data)
+                        # Normalize
+                        if not file.endswith('seg.nii.gz'):
+                            data, stats = normalize(data)
 
-                    # Transpose
-                    data = data.transpose(2, 0, 1)
+                        # Transpose
+                        data = data.transpose(2, 0, 1)
 
-                    # Save to file
-                    utils.save_nii(data, output_path)
+                        # Save to file
+                        utils.save_nii(data, output_path)
+
+    with tqdm(enumerate(validation_set), total=len(training_set)) as pbar: # progress bar
+        for i, item in pbar:
+            for root, dirs, files in os.walk(item['path']):
+                for file in files:
+                    if file.endswith('.nii.gz'):
+
+                        full_file_path = os.path.join(root, file)
+
+                        output_path = os.path.join(
+                            opt.output_dir,
+                            'val',
+                            item['patient'],
+                            file.replace('.nii.gz', '.nii')
+                        )
+
+                        # Create output directory if not yet exists
+                        directory = os.path.dirname(output_path)
+                        if not os.path.exists(directory):
+                            os.makedirs(directory)
+
+                        # Read NifTI file
+                        data, affine = utils.read_nii(full_file_path)
+
+                        # Normalize
+                        if not file.endswith('seg.nii.gz'):
+                            data, stats = normalize(data)
+
+                        # Transpose
+                        data = data.transpose(2, 0, 1)
+
+                        # Save to file
+                        utils.save_nii(data, output_path)                    
 
 if __name__ == "__main__":
     main()
