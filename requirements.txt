@@ -2,5 +2,6 @@ matplotlib
 nibabel
 nilearn
 numpy
+tensorboardX
 torch
 torchvision

@@ -9,7 +9,7 @@ import utils
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--split', default=0.8, help='Fraction of train/val split')
+parser.add_argument('--split', default=0.8, type=float, help='Fraction of train/val split')
 parser.add_argument('--output-dir', required=True, help= 'Output directory')
 opt = parser.parse_args()
 
@@ -40,6 +40,7 @@ def main():
 
     #shuffle and split into train and validation sets
     np.random.shuffle(patients)
+    print(opt.split * len(patients))
     split_index = int(opt.split * len(patients))
     training_set = patients[:split_index]
     validation_set = patients[split_index:]
