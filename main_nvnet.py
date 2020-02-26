@@ -159,22 +159,26 @@ def main():
                   optimizer=optimizer, 
                   logger=train_logger)
         scheduler.step(val_loss)
-        # if config["checkpoint"] and val_acc >= max_val_acc - 0.10:
-        #     max_val_acc = val_acc
-        #     save_dir = os.path.join(config["result_path"], config["model_file"].split("/")[-1].split(".h5")[0])
-        #     if not os.path.exists(save_dir):
-        #         os.makedirs(save_dir)
-        #     save_states_path = os.path.join(save_dir,'epoch_{0}_val_loss_{1:.4f}_acc_{2:.4f}.pth'.format(i, val_loss, val_acc))
-        #     states = {
-        #         'epoch': i + 1,
-        #         'state_dict': model.state_dict(),
-        #         'optimizer': optimizer.state_dict(),
-        #     }
-        #     torch.save(states, save_states_path)
-        #     save_model_path = os.path.join(save_dir, "best_model_file_{0}.pth".format(i))
-        #     if os.path.exists(save_model_path):
-        #         os.system("rm "+save_model_path)
-        #     torch.save(model, save_model_path)
+        if config["checkpoint"] and val_acc >= max_val_acc - 0.10:
+            max_val_acc = val_acc
+            save_dir = os.path.join(config["result_path"], config["model_file"].split("/")[-1].split(".h5")[0])
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
+            save_states_path = os.path.join(save_dir,'epoch_{0}_val_loss_{1:.4f}_acc_{2:.4f}.pth'.format(i, val_loss, val_acc))
+            states = {
+                'epoch': i + 1,
+                # 'state_dict': model.state_dict(),
+                'encoder': model.encoder.state_dict(),
+                'decoder': model.decoder.state_dict(),
+                'vae': model.vae.state_dict(),
+                'optimizer': optimizer.state_dict(),
+            }
+            torch.save(states, save_states_path)
+            save_model_path = os.path.join(save_dir, "best_model_file_{0}.pth".format(i))
+            if os.path.exists(save_model_path):
+                os.system("rm "+save_model_path)
+            # torch.save(model, save_model_path)
+            torch.save(states, save_model_path)
 
 if __name__ == "__main__":
     main()
