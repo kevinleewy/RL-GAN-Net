@@ -73,7 +73,7 @@ config["data_file"] = os.path.abspath("isensee_mixed_brats_data.h5")
 config["training_dir"] = "../preprocessed/train"
 config["validation_dir"] = "../preprocessed/val"
 config["test_dir"] = "../preprocessed/val"
-config["saved_model_file"] = "checkpoint_models/single_label_1_dice/epoch_9_val_loss_0.8460_acc_0.3872.pth"
+config["saved_model_file"] = "checkpoint_models/modality=1/epoch_9_val_loss_0.8460_acc_0.3872.pth"
 config["overwrite"] = False  # If True, will create new files. If False, will use previously written files.
 config["L2_norm"] = 1e-5
 config["patience"] = 3
