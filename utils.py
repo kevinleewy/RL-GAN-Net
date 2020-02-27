@@ -98,7 +98,10 @@ def load_old_model(model, optimizer, saved_model_path):
     print("Constructing model from saved file... ")
     checkpoint = torch.load(saved_model_path)
     epoch = checkpoint["epoch"]
-    model.load_state_dict(checkpoint["state_dict"])
+    # model.load_state_dict(checkpoint["state_dict"])
+    model.encoder.load_state_dict(checkpoint["encoder"])
+    model.decoder.load_state_dict(checkpoint["decoder"])
+    model.vae.load_state_dict(checkpoint["vae"])
     optimizer.load_state_dict(checkpoint["optimizer"])
     
     return model, epoch, optimizer 
